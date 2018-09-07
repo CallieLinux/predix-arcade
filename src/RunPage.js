@@ -6,12 +6,10 @@ import "./RunPage.css";
 import config from "./config";
 import ControlsModal from "./ControlsModal";
 import FrameTimer from "./FrameTimer";
-import GameTimer from "./GameTimer";
 import KeyboardController from "./KeyboardController";
 import Screen from "./Screen";
 import Speakers from "./Speakers";
 import { NES } from "jsnes";
-import { incrementPlayCount } from "./utils";
 
 function loadBinary(path, callback, handleProgress) {
   var req = new XMLHttpRequest();
@@ -157,10 +155,6 @@ class RunPage extends Component {
       onWriteFrame: Raven.wrap(this.screen.writeBuffer)
     });
 
-    this.gameTimer = new GameTimer({
-      romName: this.props.match.params.rom
-    });
-
     this.keyboardController = new KeyboardController({
       onButtonDown: this.nes.buttonDown,
       onButtonUp: this.nes.buttonUp
@@ -189,7 +183,6 @@ class RunPage extends Component {
   load = () => {
     if (this.props.match.params.rom) {
       const path = config.BASE_ROM_URL + this.props.match.params.rom;
-      incrementPlayCount(this.props.match.params.rom);
       this.currentRequest = loadBinary(
         path,
         (err, data) => {
@@ -228,13 +221,11 @@ class RunPage extends Component {
   start = () => {
     this.frameTimer.start();
     this.speakers.start();
-    this.gameTimer.start();
   };
 
   stop = () => {
     this.frameTimer.stop();
     this.speakers.stop();
-    this.gameTimer.stop();
   };
 
   handlePauseResume = () => {
